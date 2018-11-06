@@ -1,4 +1,4 @@
-# cs4243_project
+# CS4243 Project
 ## 3D Reconstruction
 Matlab script: reconstruction.m
 ## For Visualization
