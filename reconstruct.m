@@ -12,18 +12,18 @@ for i = 1 : size(cam1FileList)
                                     cam3Annot(j,:));
     end
     trajectory(ismember(trajectory,[-999,-999,-999], 'rows'),:) = [];
-    csvwrite(strcat('s', i,'.csv'), trajectory);
+    csvwrite(strcat('s', int2str(i),'.csv'), trajectory);
+    
+    %Remove this to run for all events ie 10 different videos
     keyboard
 end
 
-function coordinates = compute3d(cam1ImgPt, cam2ImgPt, cam3ImgPt)
-    %need to check if there are negative coordiantes. May need to change
-    %to other values
-
+function coordinates = compute3d(cam1ImgPt, cam2ImgPt, cam3ImgPt) 
     % Computing A of Ax = 0. Minimum 2 cameras
     A = [];
     if (~isequal(cam1ImgPt, [0 0]))
         A = [A; computeComponent(1, cam1ImgPt(1), cam1ImgPt(2))];
+
     end
     if (~isequal(cam2ImgPt, [0 0]))
         A = [A; computeComponent(2, cam2ImgPt(1), cam2ImgPt(2))];
@@ -43,6 +43,9 @@ function coordinates = compute3d(cam1ImgPt, cam2ImgPt, cam3ImgPt)
 end
 
 function a = computeComponent(camNum, u, v)
+    u = u - 1920/2;
+    v = v - 1080/2;
+    
     R1 = [9.6428667991264605e-01  -2.6484969138677328e-01 -2.4165916859785336e-03;
     -8.9795446022112396e-02 -3.1832382771611223e-01 -9.4371961862719200e-01;
     2.4917459103354755e-01 9.1023325674273947e-01 -3.3073772313234923e-01];
@@ -58,11 +61,11 @@ function a = computeComponent(camNum, u, v)
     AllR = {R1, R2, R3};
 
     t1 = [1.3305621037591506e-01; -2.5319578738559911e-01; 2.2444637695699150e+00];
-    t1 = -inv(R1) * t1
+    t1 = -inv(R1) * t1;
     t2 = [-4.2633372670025989e-02; -3.5441906393933242e-01; 2.2750378317324982e+00];
-    t2 = -inv(R2) * t2
+    t2 = -inv(R2) * t2;
     t3 = [-6.0451734755080713e-02; -3.9533167111966377e-01; 2.2979640654841407e+00];
-    t3 = -inv(R3) * t3
+    t3 = -inv(R3) * t3;
     
     Allt = {t1, t2, t3};
 
@@ -96,7 +99,7 @@ function a = computeComponent(camNum, u, v)
     a = [i(1)-c*k(1) i(2)-c*k(2) i(3)-c*k(3) ...
         c*t(1)*k(1)+c*t(2)*k(2)+c*t(3)*k(3)-t(1)*i(1)-t(2)*i(2)-t(3)*i(3);
         j(1)-d*k(1) j(2)-d*k(2) j(3)-d*k(3) ... 
-        d*t(1)*k(1)+d*t(2)*k(2)+d*t(3)*k(3)-t(1)*j(1)-t(2)*j(2)-t(3)*k(3)];
+        d*t(1)*k(1)+d*t(2)*k(2)+d*t(3)*k(3)-t(1)*j(1)-t(2)*j(2)-t(3)*j(3)];
 end
 
 function [a1, a2, a3] = readAnnotations(file1, file2, file3)
